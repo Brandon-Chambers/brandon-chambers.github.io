@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+         <link rel="stylesheet" href="style.css">
+    </head>
+    <body>        
+        <div class="game-area">
+            <span id="tool_menu" class="collapsed">
+            
+                <div class="tab-container">
+                    <!-- <div class="tool_tab"        data-category="floors">    Debug - Floors   </div> -->
+                    <div class="tool_tab"        data-category="entities">  Furniture        </div>
+                    <div class="tool_tab"        data-category="orders">    Orders           </div>
+                    <div class="tool_tab"        data-category="build">     Walls            </div>
+                    <div class="tool_tab"        data-category="zones">     Rooms            </div>
+                </div>
+            
+                <hr>
+            
+                <div id="floors" class="button-list">
+                    <div class="button-item" data-name="dirt">  Dirt </div>
+                    <div class="button-item" data-name="water"> Water </div>
+                    <div class="button-item" data-name="mud">   Mud  </div>
+                    <div class="button-item" data-name="stone"> Stone </div>
+                </div>
+            
+                <div id="entities" class="button-list">
+                    <div class="button-item" data-name="bed">         Bed         </div>
+                    <div class="button-item" data-name="blockcutter"> Blockcutter </div>
+                    <div class="button-item" data-name="door">        Door        </div>
+                </div>
+                            
+                <div id="orders" class="button-list">
+                    <div class="button-item" data-name="chop">         Chop         </div>
+                    <div class="button-item" data-name="mine">         Mine         </div>
+                    <div class="button-item" data-name="harvest">      Harvest      </div>
+                    <div class="button-item" data-name="haul">         Dump         </div>
+                    <div class="button-item" data-name="deconstruct">  Deconstruct  </div>
+                    <div class="button-item" data-name="cancel">       Cancel       </div>
+                </div>
+                
+                <div id="build" class="button-list">
+                    <div class="button-item" data-name="T_wooden_wall">  Wooden Wall </div>
+                </div>
+                
+                <div id="zones" class="button-list">
+                    <div class="button-item" data-name="dorm">        Dormitory         </div>
+                    <div class="button-item" data-name="bedroom">     Bedroom           </div>
+                    <div class="button-item" data-name="stockpile">   Stockpile         </div>
+                    <div class="button-item" data-name="p_stockpile"> Dump              </div>
+                    <div class="button-item" data-name="pasture">     Pasture           </div>
+                    <div class="button-item" data-name="grow">        Grow              </div>
+                    <div class="button-item" data-name="delete_zone"> Remove            </div>
+                </div>
+                
+            </span>
+            
+            <span id="canvas_wrapper">
+                <canvas id="gameCanvas"></canvas>
+                <span  id="menu_offset"> </span>
+            </span>
+            
+        </div>
+        
+        <span id='timer_buttons'>
+            <span class="time_button"        time_factor = 0>  ||   </span>
+            <span class="time_button active" time_factor = 1>  >    </span>
+            <span class="time_button"        time_factor = 3>  >>   </span>
+            <span class="time_button"        time_factor = 6>  >>>  </span>
+            <span class="time_button"        time_factor = 20> >>>> </span>
+        </span>
+
+        <span id='calendar'> </span>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+        <script src='dorflike_min.js'>    </script>
+
+    </body>
+</html>
