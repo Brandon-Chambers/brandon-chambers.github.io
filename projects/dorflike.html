@@ -3,12 +3,31 @@
     <head>
          <link rel="stylesheet" href="style.css">
     </head>
-    <body>        
+    <body>
+    
+        <div id='loading_screen'>
+            DORFLIKE
+        </div>
+        
+        <button id="helpButton">?</button>
+
+        <div id="helpOverlay">
+            <button id="closeHelpButton">&times;</button>
+            <h1>Dorflike</h1>
+            <h2>Introduction</h2>
+            <p>Welcome to this prototype build of Dorflike. The basic logic of pathfinding, task assignment, rooms, reusable data formats has been implemented.</p> 
+            <p> If you have found a bug or want to ask a question, reach me at brandon.d.chambers@gmail.com </p>
+            <h2>Controls</h2>
+            <p>Move the Camera with WASD. Time controls are below but SPACE is a shortcut for pausing. Orders, Constructions and Rooms are on the left hand side of the screen.</p> 
+            <p> Pressing Q will allow you to quickly drop the tool you have selected. </p> 
+            <p> Clicking on an element on the main game canvas with no tool selected brings up a menu that allows you to view/manipulate that character.</p>
+            <p> This brings up a menu to select every item on the tile (C for Character, E for Entity and Z for Zone).</p>
+        </div>
+        
         <div class="game-area">
             <span id="tool_menu" class="collapsed">
             
                 <div class="tab-container">
-                    <!-- <div class="tool_tab"        data-category="floors">    Debug - Floors   </div> -->
                     <div class="tool_tab"        data-category="entities">  Furniture        </div>
                     <div class="tool_tab"        data-category="orders">    Orders           </div>
                     <div class="tool_tab"        data-category="build">     Walls            </div>
@@ -34,7 +53,6 @@
                     <div class="button-item" data-name="chop">         Chop         </div>
                     <div class="button-item" data-name="mine">         Mine         </div>
                     <div class="button-item" data-name="harvest">      Harvest      </div>
-                    <div class="button-item" data-name="haul">         Dump         </div>
                     <div class="button-item" data-name="deconstruct">  Deconstruct  </div>
                     <div class="button-item" data-name="cancel">       Cancel       </div>
                 </div>
@@ -47,7 +65,6 @@
                     <div class="button-item" data-name="dorm">        Dormitory         </div>
                     <div class="button-item" data-name="bedroom">     Bedroom           </div>
                     <div class="button-item" data-name="stockpile">   Stockpile         </div>
-                    <div class="button-item" data-name="p_stockpile"> Dump              </div>
                     <div class="button-item" data-name="pasture">     Pasture           </div>
                     <div class="button-item" data-name="grow">        Grow              </div>
                     <div class="button-item" data-name="delete_zone"> Remove            </div>
@@ -63,7 +80,7 @@
         </div>
         
         <span id='timer_buttons'>
-            <span class="time_button"        time_factor = 0>  ||   </span>
+            <span class="pause_button"                      >  ||   </span>
             <span class="time_button active" time_factor = 1>  >    </span>
             <span class="time_button"        time_factor = 3>  >>   </span>
             <span class="time_button"        time_factor = 6>  >>>  </span>
@@ -72,9 +89,9 @@
 
         <span id='calendar'> </span>
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js?v=April15"></script>
 
-        <script src='dorflike_min.js'>    </script>
+        <script src='dorflike_min.js?v=April15' defer>    </script>
 
     </body>
 </html>
