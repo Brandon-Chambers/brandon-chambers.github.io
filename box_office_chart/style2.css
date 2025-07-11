@@ -134,10 +134,13 @@ body {
 }
 
 .legend-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 15px;
-    font-size: 14px;
+  display: grid;
+  
+  /* This is the magic line! */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+  gap: 1rem; /* Adjust the space between items */
+  font-size: 12px;
 }
 
 .legend-item {
