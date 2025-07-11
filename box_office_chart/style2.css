@@ -6,7 +6,8 @@ body {
 
 #select_which
 {
-    margin: 30px;
+  display:block;   /* make it a block-level element */
+  margin:0 auto;   /* left & right margins take up remaining space */
 }
 
 .chart-container {
@@ -31,7 +32,7 @@ body {
 
 .bar-container {
     flex: 1;
-    height: 25px;
+    height: 35px;
     border-radius: 3px;
     position: relative;
     overflow: hidden;
@@ -43,6 +44,13 @@ body {
     position: relative;
     cursor: pointer;
     transition: opacity 0.2s ease;
+    float: left;
+    background-color: #D4E4F2;
+}
+
+.movie-bar.odd
+{
+    background-color: #BFD6E6;
 }
 
 .tooltip {
@@ -64,6 +72,88 @@ body {
     color: #333;
     font-size: 24px;
 }
+
+/* CSS for individual Franchises */
+
+.movie-bar.franchise
+{
+    border-color: white;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.franchise.mcu {
+    background: linear-gradient(135deg, #c62828 0%, #e57373 100%);
+}
+.franchise.dc {
+    background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
+}
+.franchise.disney-animated {
+    background: linear-gradient(135deg, #4a148c 0%, #7b1fa2 100%);
+}
+.franchise.pixar {
+    background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%);
+}
+.franchise.spider-man {
+    background: linear-gradient(180deg, #d32f2f 0%, #1976d2 100%);
+}
+.franchise.star-wars {
+     background: linear-gradient(180deg, #fafafa 0%, #212121 100%);
+}
+.franchise.wizarding-world {
+    background: linear-gradient(135deg, #d84315 0%, #ff8a65 100%);
+}
+.franchise.james-bond {
+    background: linear-gradient(135deg, #757575 0%, #bdbdbd 100%);
+}
+.franchise.x-men {
+    background: linear-gradient(180deg, #ffd600 0%, #1976d2 100%);
+}
+.franchise.disney_live_action_remakes {
+    background: linear-gradient(135deg, #5d4037 0%, #a1887f 100%);
+}
+
+/* Legend container styles */
+.franchise-legend {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: sans-serif;
+    max-width: 800px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin: 10px auto; /* Changed from just "10px" to "10px auto" */
+}
+
+.legend-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 18px;
+}
+
+.legend-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    font-size: 14px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+}
+
+.color-box {
+    display: inline-block;
+    width: 20px;
+    height: 12px;
+    margin-right: 10px;
+    border-radius: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* CSS for X-Axis */
 
 .axis-container {
     display: flex;
@@ -130,3 +220,4 @@ body {
     margin-left: 70px;
     margin-right: 90px;
 }
+

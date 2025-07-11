@@ -7,12 +7,15 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         
     
-        <link rel="stylesheet" href="style2.css">
+        <link rel="stylesheet" href="style2.css?v=7-5-25">
     
     </head>
     <body>
     
+    
+    
         <h1 class="chart-title">Domestic Box Office (Inflation Adjusted) per Year</h1>
+        
         <select id="select_which">
             <option value="All">All Movies</option>
             <option value="5">Top 5</option>
@@ -21,21 +24,80 @@
             <option value="-10">Skip Top 10</option>
         </select>
 
+        <div class="franchise-legend">
+            <h3 class="legend-title">Franchise Color Legend</h3>
+        
+            <div class="legend-grid">
+                
+                <!-- First Row -->
+                <div class="legend-item">
+                    <span class="color-box franchise mcu"></span>
+                    MCU
+                </div>
+        
+                <div class="legend-item">
+                    <span class="color-box franchise dc"></span>
+                    DC
+                </div>
+        
+                <div class="legend-item">
+                    <span class="color-box franchise disney-animated"></span>
+                    Disney Animated
+                </div>
+        
+                <div class="legend-item">
+                    <span class="color-box franchise pixar"></span>
+                    Pixar
+                </div>
+        
+                <div class="legend-item">
+                    <span class="color-box franchise spider-man"></span>
+                    Spider-Man (Excluding MCU)
+                </div>
+        
+                <!-- Second Row -->
+                <div class="legend-item">
+                    <span class="color-box franchise star-wars"></span>
+                    Star Wars
+                </div>
+        
+                <div class="legend-item">
+                    <span class="color-box franchise wizarding-world"></span>
+                    Wizarding World ( Harry Potter )
+                </div>
+        
+                <div class="legend-item">
+                    <span class="color-box franchise james-bond"></span>
+                    James Bond
+                </div>
+        
+                <div class="legend-item">
+                    <span class="color-box franchise x-men"></span>
+                    X-Men
+                </div>
+        
+                <div class="legend-item">
+                    <span class="color-box franchise disney_live_action_remakes"></span>
+                    Disney Live Action Remakes
+                </div>
+        
+            </div>
+        </div>
     
         <div id="root"> </div>
         
-        <script src='box_office_chart.js'> </script>
+        <script src='box_office_chart.js?v=7-5-25'> </script>
     
         <br>
         
         <h2> Conclusions </h2>
         
-        <p> The most obvious thing to see is just how massively Covid affected the box office. The box office cratered, and remained depressed for the next year. </p>
+        <p> The most obvious thing to see is just how massively Covid affected the box office. The box office cratered, with the box office remaining depressed for the next year. </p>
         
         <p> A lot has been said about whether Hollywood revenues have recovered after Covid, and this chart is pretty conclusive. Not only have they not recovered, they have not even been able to reach the steady downward trend starting from the peak at 2002. 
             What is more worrying is that this decline is largely driven by movies outside of the ten with the highest box office. The ten highest show no strong long term trend, while the losses are clearly being seen in the tail of the distribution.
         </p>
         
-        <a href="https://brandon-chambers.github.io">Connect with Me</a>
+        <a href="https://brandon-chambers.github.io">Connect with Me, via Linkedin or Email</a>
     </body>
 </html>

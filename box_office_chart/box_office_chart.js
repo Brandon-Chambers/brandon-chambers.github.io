@@ -1,14 +1,15 @@
 let YEAR_TO_ITS_MOVIES = null;
 let currentRenderToken = null; // Track current render operation
-
-const COLORS = ["#D6EAF8", "#AED6F1", "#85C1E9", "#5DADE2", "#3498DB"];
+    
+    
+attachTooltipEvents(); // Event Delegation!
 
 fetchMovieData();
 $("#select_which").on("change", build_bar_chart_of_movie_data);
 
 async function fetchMovieData() {
     try {
-        const response = await fetch('./movies.json');
+        const response = await fetch('./movies_with_franchises.json');
         if (!response.ok) {
             throw new Error('Network error');
         }
@@ -55,7 +56,7 @@ async function build_bar_chart_of_movie_data() {
     
     // Create years array for processing
     const years = [];
-    for (let year = 2025; year >= 1977; year--) {
+    for (let year = 2024; year >= 1977; year--) {
         years.push(year);
     }
     
@@ -66,6 +67,8 @@ async function build_bar_chart_of_movie_data() {
     if (completed && currentRenderToken === renderToken) {
         await addAxisToChart($chartContainer, highest_total);
     }
+    
+    attachTooltipEvents();
 }
 
 function calculateHighestTotal(selectedValue) {
@@ -116,14 +119,22 @@ function createYearRow(year, $chartContainer, selectedValue, highest_total) {
     const movies_to_render = filterMovies(movies, selectedValue);
 
     movies_to_render.forEach((movie, index) => {
+    
+         const parity = index % 2;
+         const parity_class = parity ? "" : "odd";
+    
         const movie_width = (movie.box_office / highest_total) * 100;
-        const $movieBar = $("<div>").addClass("movie-bar").css({
-            "width": movie_width + "%",
-            "background-color": COLORS[index % COLORS.length],
-            "float": "left"
-        });
+        const $movieBar = $("<div>").addClass("movie-bar").addClass(parity_class).css({"width": movie_width + "%"});
 
-        attachTooltipEvents($movieBar, movie);
+        if ( movie.franchise )
+        {
+            $movieBar.addClass( "franchise" );
+            $movieBar.addClass( movie.franchise );
+        }
+
+        $movieBar.attr("movie_title", movie.movie);
+        $movieBar.attr("box_office", movie.box_office);
+
         $barContainer.append($movieBar);
     });
 }
@@ -132,31 +143,29 @@ let hover_timeout;
 let $tooltip;
 
 
-function attachTooltipEvents($movieBar, movie) {
+function attachTooltipEvents() {
     
-    $movieBar.on('mouseenter', function(e) {
+    $(".chart-container").on('mouseenter', '.movie-bar', function(e) { 
         hover_timeout = setTimeout(() => {
             
-        if ($tooltip) {
-                    $tooltip.remove();
-                    $tooltip = null;
-                }
+            if ($tooltip) {
+                $tooltip.remove();
+                $tooltip = null;
+            }
             
             $tooltip = $("<div>").addClass("tooltip").html(
-                "<strong>" + movie.movie + "</strong><br>$" + movie.box_office.toLocaleString()
+                "<strong>" + $(this).attr("movie_title") + "</strong><br>$" + $(this).attr("box_office").toLocaleString()
             );
-
-            const bar_offset = $movieBar.offset();
+            const bar_offset = $(this).offset();
             $tooltip.css({
                 "left": bar_offset.left + "px",
                 "top": (bar_offset.top - 60) + "px"
             });
-
             $("body").append($tooltip);
         }, 250);
     });
-
-    $movieBar.on('mouseleave', function() {
+    
+    $(".chart-container").on('mouseleave', '.movie-bar', function(e) { 
         clearTimeout(hover_timeout);
         if ($tooltip) {
             $tooltip.remove();
