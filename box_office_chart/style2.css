@@ -83,35 +83,36 @@ body {
 }
 
 .franchise.mcu {
-    background: linear-gradient(135deg, #c62828 0%, #e57373 100%);
+    background: #e53935;
 }
 .franchise.dc {
-    background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
+    background: #2196f3;
 }
 .franchise.disney-animated {
-    background: linear-gradient(135deg, #4a148c 0%, #7b1fa2 100%);
+    background: #4a148c;
 }
 .franchise.pixar {
-    background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%);
+    background: #ff9800;
 }
 .franchise.spider-man {
-    background: linear-gradient(180deg, #d32f2f 0%, #1976d2 100%);
+    background: #ff80ab;
 }
 .franchise.star-wars {
-     background: linear-gradient(180deg, #fafafa 0%, #212121 100%);
+    background: #212121;
 }
 .franchise.wizarding-world {
-    background: linear-gradient(135deg, #d84315 0%, #ff8a65 100%);
+    background: #00bcd4;
 }
-.franchise.james-bond {
-    background: linear-gradient(135deg, #757575 0%, #bdbdbd 100%);
+.franchise.james_bond {
+    background: #757575;
 }
 .franchise.x-men {
-    background: linear-gradient(180deg, #ffd600 0%, #1976d2 100%);
+    background: #ffff00;
 }
 .franchise.disney_live_action_remakes {
-    background: linear-gradient(135deg, #5d4037 0%, #a1887f 100%);
+    background: #4caf50;
 }
+
 
 /* Legend container styles */
 .franchise-legend {

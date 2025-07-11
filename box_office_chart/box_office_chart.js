@@ -1,13 +1,17 @@
 let YEAR_TO_ITS_MOVIES = null;
 let currentRenderToken = null; // Track current render operation
     
-    
-attachTooltipEvents(); // Event Delegation!
+$( document ).ready( function () { 
 
-fetchMovieData();
-$("#select_which").on("change", build_bar_chart_of_movie_data);
+    attachTooltipEvents(); // Event Delegation, easier than adding thousands of events.
+    fetchMovieDataAndBuild();
 
-async function fetchMovieData() {
+    $("#select_which").on("change", build_bar_chart_of_movie_data);
+
+} );
+
+
+async function fetchMovieDataAndBuild() {
     try {
         const response = await fetch('./movies_with_franchises.json');
         if (!response.ok) {
@@ -23,7 +27,7 @@ async function fetchMovieData() {
             }
             YEAR_TO_ITS_MOVIES.get(datum.released).push(datum);
         }
-                
+        
         build_bar_chart_of_movie_data();
     }
     catch (error) {
@@ -120,9 +124,9 @@ function createYearRow(year, $chartContainer, selectedValue, highest_total) {
 
     movies_to_render.forEach((movie, index) => {
     
-         const parity = index % 2;
-         const parity_class = parity ? "" : "odd";
-    
+        const parity = index % 2;
+        const parity_class = parity ? "" : "odd";
+        
         const movie_width = (movie.box_office / highest_total) * 100;
         const $movieBar = $("<div>").addClass("movie-bar").addClass(parity_class).css({"width": movie_width + "%"});
 
@@ -154,7 +158,7 @@ function attachTooltipEvents() {
             }
             
             $tooltip = $("<div>").addClass("tooltip").html(
-                "<strong>" + $(this).attr("movie_title") + "</strong><br>$" + $(this).attr("box_office").toLocaleString()
+                "<strong>" + $(this).attr("movie_title") + "</strong><br> $" + ( parseInt($(this).attr("box_office") ) .toLocaleString() )
             );
             const bar_offset = $(this).offset();
             $tooltip.css({
