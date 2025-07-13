@@ -1,0 +1,227 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f5f5f5;
+}
+
+#select_which
+{
+  display:block;   /* make it a block-level element */
+  margin:0 auto;   /* left & right margins take up remaining space */
+}
+
+.chart-container {
+    width: 100%;
+}
+
+.chart-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2px;
+    min-height: 30px;
+}
+
+.year-label {
+    text-align: right;
+    padding-right: 12px;
+    color: #333;
+    flex-shrink: 0;
+    width: 36px;
+    height: 20px;
+}
+
+.bar-container {
+    flex: 1;
+    height: 35px;
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+}
+
+.movie-bar {
+    height: 100%;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    float: left;
+    background-color: #D4E4F2;
+}
+
+.movie-bar.odd
+{
+    background-color: #BFD6E6;
+}
+
+.tooltip {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.chart-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 24px;
+}
+
+/* CSS for individual Franchises */
+
+.movie-bar.franchise
+{
+    border-color: white;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.franchise.mcu {
+    background: #e53935;
+}
+.franchise.dc {
+    background: #2196f3;
+}
+.franchise.disney-animated {
+    background: #4a148c;
+}
+.franchise.pixar {
+    background: #ff9800;
+}
+.franchise.spider-man {
+    background: #ff80ab;
+}
+.franchise.star-wars {
+    background: #212121;
+}
+.franchise.wizarding-world {
+    background: #00bcd4;
+}
+.franchise.james_bond {
+    background: #757575;
+}
+.franchise.x-men {
+    background: #ffff00;
+}
+.franchise.disney_live_action_remakes {
+    background: #4caf50;
+}
+
+
+/* Legend container styles */
+.franchise-legend {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: sans-serif;
+    max-width: 800px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin: 10px auto; /* Changed from just "10px" to "10px auto" */
+}
+
+.legend-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 18px;
+}
+
+.legend-grid {
+  display: grid;
+  
+  /* This is the magic line! */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+  gap: 1rem; /* Adjust the space between items */
+  font-size: 12px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+}
+
+.color-box {
+    display: inline-block;
+    width: 20px;
+    height: 12px;
+    margin-right: 10px;
+    border-radius: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* CSS for X-Axis */
+
+.axis-container {
+    display: flex;
+    align-items: flex-end;
+    margin-top: 10px;
+}
+
+.axis-line {
+    height: 2px;
+    background-color: #333;
+    position: relative;
+    flex: 1;
+}
+
+.tick-marks {
+    position: relative;
+    flex: 1;
+    height: 20px;
+}
+
+.tick {
+    position: absolute;
+    height: 8px;
+    width: 1px;
+    background-color: #333;
+    bottom: 0;
+}
+
+.bold-tick {
+    position: absolute;
+    height: 8px;
+    width: 3px;
+    background-color: #333;
+    bottom: 0;
+}
+
+
+.tick-label {
+    position: absolute;
+    font-size: 12px;
+    color: #666;
+    bottom: -15px;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+.bold-tick-label {
+    position: absolute;
+    font-size: 12px;
+    color: #666;
+    bottom: -15px;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+
+.axis-title {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 12px;
+    color: #666;
+    font-weight: bold;
+    margin-left: 70px;
+    margin-right: 90px;
+}
+
