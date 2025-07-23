@@ -13,7 +13,7 @@ function GameSalesChart() {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const response = await fetch('./processed_games.json');
+                const response = await fetch('./processed_games.json?v=jul_23');
                 if (!response.ok) throw new Error('Failed to load games data');
                 const data = await response.json();
                 setGames(data.sort((a, b) => b.sales - a.sales));

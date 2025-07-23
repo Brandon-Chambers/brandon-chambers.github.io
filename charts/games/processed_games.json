@@ -48,6 +48,7 @@
         "developer": "PUBG Corporation",
         "sales": 75000000,
         "array_of_consoles": [
+            "PC",
             "Microsoft Xbox One",
             "Sony PlayStation 4"
         ]
@@ -191,15 +192,6 @@
         "sales": 37380000,
         "array_of_consoles": [
             "Nintendo Wii"
-        ]
-    },
-    {
-        "title": "PLAYERUNKNOWN'S BATTLEGROUNDS",
-        "publisher": "PUBG Corporation",
-        "developer": "PUBG Corporation",
-        "sales": 36600000,
-        "array_of_consoles": [
-            "PC"
         ]
     },
     {
