@@ -2310,16 +2310,6 @@
         ]
     },
     {
-        "title": "The Legend of Zelda: Link's Awakening",
-        "publisher": "Nintendo",
-        "developer": "Nintendo",
-        "sales": 10290000,
-        "array_of_consoles": [
-            "Nintendo Switch",
-            "Nintendo Game Boy"
-        ]
-    },
-    {
         "title": "Dr. Mario",
         "publisher": "Nintendo",
         "developer": "Nintendo R&D1",
@@ -4591,6 +4581,15 @@
             "Microsoft Xbox 360",
             "PC",
             "Nintendo Wii U"
+        ]
+    },
+    {
+        "title": "The Legend of Zelda: Link's Awakening (Switch)",
+        "publisher": "Nintendo",
+        "developer": "Nintendo",
+        "sales": 6460000,
+        "array_of_consoles": [
+            "Nintendo Switch"
         ]
     },
     {
@@ -8286,15 +8285,6 @@
         ]
     },
     {
-        "title": "The Legend of Zelda: Oracle of Ages / Seasons",
-        "publisher": "Nintendo",
-        "developer": "Capcom",
-        "sales": 3990000,
-        "array_of_consoles": [
-            null
-        ]
-    },
-    {
         "title": "Burnout 3: Takedown",
         "publisher": "Electronic Arts",
         "developer": "Criterion Games",
@@ -8570,6 +8560,15 @@
             "Sony PlayStation 4",
             "Microsoft Xbox One",
             null
+        ]
+    },
+    {
+        "title": "The Legend of Zelda: Link's Awakening",
+        "publisher": "Nintendo",
+        "developer": "Nintendo EAD",
+        "sales": 3830000,
+        "array_of_consoles": [
+            "Nintendo Game Boy"
         ]
     },
     {
@@ -18153,18 +18152,6 @@
         ]
     },
     {
-        "title": "Castlevania",
-        "publisher": "Konami",
-        "developer": "Konami",
-        "sales": 1870000,
-        "array_of_consoles": [
-            "Nintendo Entertainment System",
-            "Nintendo 64",
-            null,
-            "PC"
-        ]
-    },
-    {
         "title": "Gex",
         "publisher": "BMG Interactive Entertainment",
         "developer": "Crystal Dynamics",
@@ -25364,6 +25351,17 @@
         "sales": 1230000,
         "array_of_consoles": [
             "Game Boy Advance"
+        ]
+    },
+    {
+        "title": "Castlevania",
+        "publisher": "Konami",
+        "developer": "Konami",
+        "sales": 1230000,
+        "array_of_consoles": [
+            "Nintendo Entertainment System",
+            null,
+            "PC"
         ]
     },
     {
@@ -39950,6 +39948,15 @@
         "sales": 640000,
         "array_of_consoles": [
             "PC"
+        ]
+    },
+    {
+        "title": "Castlevania 64",
+        "publisher": "Konami",
+        "developer": "KCEK",
+        "sales": 640000,
+        "array_of_consoles": [
+            "Nintendo 64"
         ]
     },
     {
