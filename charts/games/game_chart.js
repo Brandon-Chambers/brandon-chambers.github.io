@@ -72,7 +72,7 @@ function useGameSearch(games) {
         // If no search terms have content, return all games with default color
         const hasActiveSearch = searchTerms.some(item => item.term.trim());
         if (!hasActiveSearch) {
-            return games.map(game => ({ ...game, searchColor: '#3498db' }));
+            return games.map(game => ({ ...game, searchColor: '#D3D3D3' }));
         }
         
         return results;
