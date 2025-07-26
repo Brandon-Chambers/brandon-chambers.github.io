@@ -210,16 +210,41 @@ async function addAxisToChart($chartContainer, highest_total) {
         $tickMarks.append($tickLabel);
     }
     
-    const $axisTitle = $("<div>").addClass("axis-title").text("Inflation Adjusted Box Office Revenue (Billion USD), adjusted to 2025 Dollars");
+    const $axisTitle = $("<div>").addClass("axis-title").text("Box Office Revenue (Billions USD)");
     $chartContainer.append($axisTitle);
 }
 
+function franchiseFirst(a, b) {
+    const hasFranchiseA = a.franchise !== null;
+    const hasFranchiseB = b.franchise !== null;
+
+    if (hasFranchiseA && !hasFranchiseB) return -1;
+    if (!hasFranchiseA && hasFranchiseB) return 1;
+    return 0; // keep relative order if both have/don't have franchise
+}
+
+function mcuFirst(a, b) {
+    const rank = (movie) => {
+        if (movie.franchise === 'mcu') return 0;
+        return 1;
+    };
+
+    return rank(a) - rank(b);
+}
+
+
 function filterMovies(movies, selectedValue) {
     if (!movies) return [];
-    if (selectedValue === "All") return movies;
-    if (selectedValue === "5")   return movies.slice(0, 5);
-    if (selectedValue === "10")  return movies.slice(0, 10);
-    if (selectedValue === "-5")  return movies.slice(5);
-    if (selectedValue === "-10") return movies.slice(10);
+    
+    if (selectedValue === "All")        return movies;
+    if (selectedValue === "5")          return movies.slice(0, 5);
+    if (selectedValue === "10")         return movies.slice(0, 10);
+    if (selectedValue === "-5")         return movies.slice(5);
+    if (selectedValue === "-10")        return movies.slice(10);
+    if (selectedValue === "FF" )        return movies.toSorted( franchiseFirst );
+    if (selectedValue === "MCU_FIRST" ) return movies.toSorted( mcuFirst )
+    if (selectedValue === "MCU_ONLY" )  return movies.filter( (m) => m.franchise == 'mcu' );
+
+    
     return movies;
 }

@@ -4,10 +4,10 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Domestic Box Office (Inflation Adjusted) per Year, Delimited by Title </title>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js?v=july11"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         
     
-        <link rel="stylesheet" href="style2.css?v=july11">
+        <link rel="stylesheet" href="style2.css">
     
     </head>
     <body>
@@ -17,11 +17,14 @@
         <h1 class="chart-title">Domestic Box Office (Inflation Adjusted) per Year</h1>
         
         <select id="select_which">
-            <option value="All">All Movies</option>
-            <option value="5">Top 5</option>
-            <option value="10">Top 10</option>
-            <option value="-5">Skip Top 5</option>
-            <option value="-10">Skip Top 10</option>
+            <option value="All"> All Movies        </option>
+            <option value="5">   Top 5             </option>
+            <option value="10">  Top 10            </option>
+            <option value="-5">  Skip Top 5        </option>
+            <option value="-10"> Skip Top 10       </option>
+            <option value="FF">  Franchises Share  </option>
+            <option value="MCU_FIRST"> MCU Share         </option>
+            <option value="MCU_ONLY"> Just MCU          </option>
         </select>
 
         <div class="franchise-legend">
@@ -84,7 +87,7 @@
     
         <div id="root"> </div>
         
-        <script src='box_office_chart.js'> </script>
+        <script src='box_office_chart.js?v=jul_26'> </script>
             
         <a href="https://brandon-chambers.github.io">Connect with Me, via Linkedin or Email</a>
     </body>
