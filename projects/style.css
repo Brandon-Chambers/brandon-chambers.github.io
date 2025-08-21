@@ -1,6 +1,5 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
     background-color: #f0f0f0;
 
     -webkit-user-select: none; /* Safari */
@@ -79,16 +78,13 @@ canvas {
 #canvas_wrapper
 {
     display: inline-block;
-    margin: 25px;
-    width:  fit-content;
-    height: fit-content;
 }
 
 /* Tool Menu */
 
 #tool_menu
 {
-    margin-top: 20px;
+    margin-top: 45px;
     transform: translateX(-35px);
     transition-duration: 250ms;
     position: absolute;
@@ -107,20 +103,16 @@ canvas {
 
 .tab-container
 {
-    width: 150px;
-    margin-bottom: 10px;
-    margin-left: 10px;
-
+    width: 125px;
     clear: both;
 }
 .tool_tab
 {
-    padding: 8px;
-    margin: 8px;
+    padding: 4px;
+    margin:  4px;
     cursor: pointer;
     background-color: #f0f0f0;
     border: 1px solid #ddd;
-    margin-right: 5px;
 }
 .tool_tab.active
 {
@@ -134,13 +126,12 @@ canvas {
 
 .button-item
 {
-    padding: 8px;
+    padding: 4px;
+    margin:  4px;
 
     cursor: pointer;
     background-color: #f0f0f0;
     border: 1px solid #ddd;
-    margin: 8px;
-    margin-left: 22px;
 }
 
 .button-item.active
@@ -200,8 +191,9 @@ canvas {
 #menu_offset
 {
     display: none;
+    
+    
     z-index: 10;
-    width: 400px;
     border: 1px solid #ccc;
     font-family: Arial, sans-serif;
 
@@ -209,10 +201,14 @@ canvas {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(255, 255, 255, 0.7);
+    width: 33.333%;
+    height: 75%;
+    overflow: auto;
+    
+    background-color: rgba(255, 255, 255, 0.85);
+    
     padding: 10px;
     border-radius: 5px;
-
 }
 
 #menu_offset button
@@ -263,7 +259,7 @@ ul.complaints-list
    list-style-type: "\2003";
 }
 
-/* Game Menu for Needs */
+/* Game Menu for NeedsSet */
 
 .needs-container {
     width: 300px;

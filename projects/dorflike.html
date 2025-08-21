@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-         <link rel="stylesheet" href="style.css">
+         <link rel="stylesheet" href="style.css?date=aug21">
+         <title> Dorflike </title>
     </head>
     <body>
     
@@ -9,8 +10,6 @@
             DORFLIKE
         </div>
         
-        <button id="helpButton">?</button>
-
         <div id="helpOverlay">
             <button id="closeHelpButton">&times;</button>
             <h1>Dorflike</h1>
@@ -44,21 +43,26 @@
                 </div>
             
                 <div id="entities" class="button-list">
-                    <div class="button-item" data-name="bed">         Bed         </div>
-                    <div class="button-item" data-name="blockcutter"> Blockcutter </div>
-                    <div class="button-item" data-name="door">        Door        </div>
+                    <div class="button-item" data-name="bed">          Bed          </div>
+                    <div class="button-item" data-name="blockcutter">  Blockcutter  </div>
+                    <div class="button-item" data-name="door">         Door         </div>
+                    <div class="button-item" data-name="still">        Still        </div>
+                    <div class="button-item" data-name="outhouse">     Outhouse     </div>
+
+                    <div class="button-item" data-name="cancel-bp">      Cancel       </div>
                 </div>
                             
                 <div id="orders" class="button-list">
                     <div class="button-item" data-name="chop">         Chop         </div>
                     <div class="button-item" data-name="mine">         Mine         </div>
                     <div class="button-item" data-name="harvest">      Harvest      </div>
-                    <div class="button-item" data-name="deconstruct">  Deconstruct  </div>
-                    <div class="button-item" data-name="cancel">       Cancel       </div>
+                    <div class="button-item" data-name="deconstruct">  Dismantle    </div>
+                    <div class="button-item" data-name="cancel-bp">    Cancel       </div>
                 </div>
                 
                 <div id="build" class="button-list">
                     <div class="button-item" data-name="T_wooden_wall">  Wooden Wall </div>
+                    <div class="button-item" data-name="cancel-bp">         Cancel       </div>
                 </div>
                 
                 <div id="zones" class="button-list">
@@ -89,9 +93,9 @@
 
         <span id='calendar'> </span>
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js?v=April15"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
-        <script src='dorflike_min.js?v=April15' defer>    </script>
+        <script src='dorflike_full.js?date=aug21' defer>    </script>
 
     </body>
 </html>
