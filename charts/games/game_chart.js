@@ -1,12 +1,10 @@
 const { useState, useEffect, useCallback, useMemo } = React;
 
 const BATCH_SIZE = 50;
-const TOOLTIP_DIMENSIONS = { width: 300, height: 150 };
-const TOOLTIP_OFFSET = 15;
 
 // Hardcoded colors for search terms
 const SEARCH_COLORS = [
-    '#75b9e7', // Blue
+    '#3498db', // Blue
     '#e74c3c', // Red
     '#2ecc71', // Green
     '#f39c12', // Orange
@@ -16,6 +14,24 @@ const SEARCH_COLORS = [
     '#e67e22'  // Carrot
 ];
 
+// Helper function to lighten a hex color
+const lightenColor = (hex, percent) => {
+    let r = parseInt(hex.slice(1, 3), 16);
+    let g = parseInt(hex.slice(3, 5), 16);
+    let b = parseInt(hex.slice(5, 7), 16);
+
+    const p = percent / 100;
+
+    r = Math.round(r + (255 - r) * p);
+    g = Math.round(g + (255 - g) * p);
+    b = Math.round(b + (255 - b) * p);
+
+    const toHex = c => ('00' + c.toString(16)).slice(-2);
+
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+};
+
+
 function useGameData() {
     const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -24,7 +40,7 @@ function useGameData() {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const response = await fetch('./processed_games.json?v=jul_25');
+                const response = await fetch('./processed_games.json?v=jul_23');
                 if (!response.ok) throw new Error('Failed to load games data');
                 const data = await response.json();
                 setGames(data.sort((a, b) => b.sales - a.sales));
@@ -59,7 +75,7 @@ function useGameSearch(games) {
         
         games.forEach(game => {
             for (let i = 0; i < searchTerms.length; i++) {
-                if (matchesAllSubstrings(game.title + " " + game.publisher + " " + game.developer, searchTerms[i].term)) {
+                if (matchesAllSubstrings(game.title, searchTerms[i].term)) {
                     results.push({
                         ...game,
                         searchColor: searchTerms[i].color
@@ -72,7 +88,7 @@ function useGameSearch(games) {
         // If no search terms have content, return all games with default color
         const hasActiveSearch = searchTerms.some(item => item.term.trim());
         if (!hasActiveSearch) {
-            return games.map(game => ({ ...game, searchColor: '#D3D3D3' }));
+            return games.map(game => ({ ...game, searchColor: '#3498db' }));
         }
         
         return results;
@@ -136,60 +152,6 @@ function useInfiniteScroll(filteredGames) {
     return visibleCount;
 }
 
-function useTooltip() {
-    const [tooltip, setTooltip] = useState({ 
-        visible: false, 
-        x: 0, 
-        y: 0, 
-        game: null 
-    });
-
-    const calculateTooltipPosition = useCallback((clientX, clientY) => {
-        let adjustedX = clientX + TOOLTIP_OFFSET;
-        let adjustedY = clientY;
-        
-        // Adjust if tooltip would go off right edge
-        if (adjustedX + TOOLTIP_DIMENSIONS.width > window.innerWidth) {
-            adjustedX = clientX - TOOLTIP_DIMENSIONS.width - TOOLTIP_OFFSET;
-        }
-        
-        // Adjust if tooltip would go off bottom edge
-        if (adjustedY + TOOLTIP_DIMENSIONS.height > window.innerHeight) {
-            adjustedY = clientY - TOOLTIP_DIMENSIONS.height;
-        }
-        
-        return { x: adjustedX, y: adjustedY };
-    }, []);
-
-    const showTooltip = useCallback((event, game) => {
-        const { x, y } = calculateTooltipPosition(event.clientX, event.clientY);
-        setTooltip({
-            visible: true,
-            x,
-            y,
-            game
-        });
-    }, [calculateTooltipPosition]);
-
-    const updateTooltipPosition = useCallback((event) => {
-        if (tooltip.visible) {
-            const { x, y } = calculateTooltipPosition(event.clientX, event.clientY);
-            setTooltip(prev => ({ ...prev, x, y }));
-        }
-    }, [tooltip.visible, calculateTooltipPosition]);
-
-    const hideTooltip = useCallback(() => {
-        setTooltip({ visible: false, x: 0, y: 0, game: null });
-    }, []);
-
-    return {
-        tooltip,
-        showTooltip,
-        updateTooltipPosition,
-        hideTooltip
-    };
-}
-
 const formatSales = (sales) => {
     if (sales >= 1000000) return `${(sales / 1000000).toFixed(1)}M`;
     if (sales >= 1000) return `${(sales / 1000).toFixed(1)}K`;
@@ -226,7 +188,7 @@ function ChartHeader() {
     );
 }
 
-function SearchInput({ searchTerms, onSearchChange, onColorChange, onAddSearchTerm, onRemoveSearchTerm, onClearTooltip }) {
+function SearchInput({ searchTerms, onSearchChange, onColorChange, onAddSearchTerm, onRemoveSearchTerm }) {
     return (
         <div className="search-div">
             {searchTerms.map((searchItem, index) => (
@@ -247,12 +209,9 @@ function SearchInput({ searchTerms, onSearchChange, onColorChange, onAddSearchTe
                     <input 
                         className="search-input"
                         type="text"
-                        placeholder={`Search term...`}
+                        placeholder={`Search term ${index + 1}...`}
                         value={searchItem.term}
-                        onChange={(e) => {
-                            onSearchChange(index, e.target.value);
-                            onClearTooltip();
-                        }}
+                        onChange={(e) => onSearchChange(index, e.target.value)}
                         style={{ flex: 1, maxWidth: '150px' }}
                     />
                 </div>
@@ -291,85 +250,32 @@ function SearchInput({ searchTerms, onSearchChange, onColorChange, onAddSearchTe
     );
 }
 
-function GameBar({ 
-    game, 
-    index, 
-    widthPercentage, 
-    onMouseEnter, 
-    onMouseLeave, 
-    onMouseMove 
-}) {
-    return (
-        <div 
-            key={index} 
-            className="game-bar"
-            onMouseEnter={(e) => onMouseEnter(e, game)}
-            onMouseLeave={onMouseLeave}
-            onMouseMove={onMouseMove}
-            style={{ cursor: 'pointer' }}
-        >
-            <div className="bar-container">
-                <div
-                    className="bar-fill"
-                    style={{ 
-                        width: `${widthPercentage}%`,
-                        backgroundColor: game.searchColor
-                    }}
-                />
-                <div 
-                    className="game-title-inside"
-                >
-                    {game.title}
-                </div>
-                <div 
-                    className="bar-text" 
-                >
-                    {formatSales(game.sales)}
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function Tooltip({ tooltip }) {
-    if (!tooltip.visible || !tooltip.game) return null;
+function GameDetails({ game, color }) {
+    const detailBackgroundColor = lightenColor(color, 85); // 85% lighter
 
     return (
         <div
+            className="game-details-dropdown"
             style={{
-                position: 'fixed',
-                left: `${tooltip.x}px`,
-                top: `${tooltip.y}px`,
-                backgroundColor: '#2c3e50',
-                color: 'white',
+                backgroundColor: detailBackgroundColor,
                 padding: '12px',
-                borderRadius: '6px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                zIndex: 1000,
-                fontSize: '14px',
-                pointerEvents: 'none',
-                border: '1px solid #34495e',
-                maxWidth: `${TOOLTIP_DIMENSIONS.width}px`,
-                minWidth: '250px'
+                marginTop: '-10px',
+                marginBottom: '6px',
+                borderRadius: '3px',
+                color: '#333',
             }}
         >
-            <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '16px' }}>
-                {tooltip.game.title}
-            </div>
             <div style={{ marginBottom: '4px' }}>
-                <strong>Sales:</strong> {formatSales(tooltip.game.sales)}
-            </div>
-            <div style={{ marginBottom: '4px' }}>
-                <strong>Developer:</strong> {tooltip.game.developer || 'Unknown'}
+                <strong>Developer:</strong> {game.developer || 'Unknown'}
             </div>
             <div style={{ marginBottom: '8px' }}>
-                <strong>Publisher:</strong> {tooltip.game.publisher || 'Unknown'}
+                <strong>Publisher:</strong> {game.publisher || 'Unknown'}
             </div>
             <div>
                 <strong>Platforms:</strong>
-                <div style={{ marginTop: '4px', lineHeight: '1.4' }}>
-                    {getSortedConsoles(tooltip.game.array_of_consoles).length > 0 
-                        ? getSortedConsoles(tooltip.game.array_of_consoles).join(', ')
+                <div style={{ marginTop: '4px' }}>
+                    {getSortedConsoles(game.array_of_consoles).length > 0
+                        ? getSortedConsoles(game.array_of_consoles).join(', ')
                         : 'Unknown'
                     }
                 </div>
@@ -378,7 +284,41 @@ function Tooltip({ tooltip }) {
     );
 }
 
-function ChartContent({ visibleGames, maxSales, tooltipHandlers }) {
+function GameBar({ game, index, widthPercentage }) {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const handleClick = () => setIsExpanded(prev => !prev);
+    const backgroundColor = lightenColor(game.searchColor, 85);
+    
+    return (
+        <React.Fragment>
+            <div 
+                key={index} 
+                className="game-bar"
+                onClick={handleClick}
+                style={{ cursor: 'pointer' }}
+            >
+                <div className="bar-container" style={{ backgroundColor: backgroundColor }}>
+                    <div
+                        className="bar-fill"
+                        style={{ 
+                            width: `${widthPercentage}%`,
+                            backgroundColor: game.searchColor
+                        }}
+                    />
+                    <div className="game-title-inside">
+                        {game.title}
+                    </div>
+                    <div className="bar-text">
+                        {formatSales(game.sales)}
+                    </div>
+                </div>
+            </div>
+            {isExpanded && <GameDetails game={game} color={game.searchColor} />}
+        </React.Fragment>
+    );
+}
+
+function ChartContent({ visibleGames, maxSales }) {
     if (visibleGames.length === 0) {
         return <div className="no-results">No games match your search.</div>;
     }
@@ -393,9 +333,6 @@ function ChartContent({ visibleGames, maxSales, tooltipHandlers }) {
                         game={game}
                         index={index}
                         widthPercentage={widthPercentage}
-                        onMouseEnter={tooltipHandlers.showTooltip}
-                        onMouseLeave={tooltipHandlers.hideTooltip}
-                        onMouseMove={tooltipHandlers.updateTooltipPosition}
                     />
                 );
             })}
@@ -407,7 +344,6 @@ function GameSalesChart() {
     const { games, loading, error } = useGameData();
     const { searchTerms, filteredGames, addSearchTerm, removeSearchTerm, updateSearchTerm, updateSearchColor } = useGameSearch(games);
     const visibleCount = useInfiniteScroll(filteredGames);
-    const { tooltip, showTooltip, updateTooltipPosition, hideTooltip } = useTooltip();
 
     const visibleGames = useMemo(() => 
         filteredGames.slice(0, visibleCount), 
@@ -418,12 +354,6 @@ function GameSalesChart() {
         filteredGames.length > 0 ? Math.max(...filteredGames.map(g => g.sales)) : 1,
         [filteredGames]
     );
-
-    const tooltipHandlers = useMemo(() => ({
-        showTooltip,
-        updateTooltipPosition,
-        hideTooltip
-    }), [showTooltip, updateTooltipPosition, hideTooltip]);
 
     if (loading) {
         return (
@@ -453,16 +383,12 @@ function GameSalesChart() {
                 onColorChange={updateSearchColor}
                 onAddSearchTerm={addSearchTerm}
                 onRemoveSearchTerm={removeSearchTerm}
-                onClearTooltip={hideTooltip}
             />
             
             <ChartContent 
                 visibleGames={visibleGames}
                 maxSales={maxSales}
-                tooltipHandlers={tooltipHandlers}
             />
-            
-            <Tooltip tooltip={tooltip} />
         </div>
     );
 }
