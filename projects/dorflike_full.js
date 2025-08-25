@@ -117,7 +117,7 @@ class FrameTime {
 FrameTime.last_frame_time = 0;
 FrameTime.deltaTRaw = 0;
 FrameTime.deltaT = 0;
-FrameTime.maxDelta = 50;
+FrameTime.maxDelta = 100;
 FrameTime.current_time = 0;
 const MS_IN_DAY = 24 * 3 * 1000; // Try 528 * 1000 for the final amount.;
 const MS_IN_HOUR = MS_IN_DAY / 24;
@@ -330,6 +330,9 @@ function prettify(inputString) {
     let prettifiedString = capitalizedWordsArray.join(' ');
     return prettifiedString;
 }
+function manh_dist(x1, y1, x2, y2) {
+    return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+}
 class Tile2D {
     constructor(x, y) {
         this.x = x;
@@ -442,7 +445,7 @@ const PEOPLE_NAMES = [
     // Female Names
     "Aelfgifu", "Bertha", "Cynethryth", "Dorothea", "Edith",
     "Frideswide", "Gunnhild", "Hilda", "Isolde", "Judith",
-    "Kenelswith", "Leofflæd", "Mildred", "Nesta", "Osburh",
+    "Kenelswith", "Mildred", "Nesta", "Osburh",
     "Prudence", "Quendreda", "Rowena", "Selah", "Theodora",
     "Aethelthryth", "Beatrice", "Constance", "Damaris", "Elspeth",
     "Fides", "Gwendolyn", "Helena", "Iphigenia", "Jezebel",
@@ -630,6 +633,25 @@ class GameMap {
                     if (distance < closestDistance) {
                         closestDistance = distance;
                         closestTile = { x: j, y: i };
+                    }
+                }
+            }
+        }
+        if (!closestTile) {
+            return null;
+        }
+        return PATHFINDING.findPath(x, y, closestTile.x, closestTile.y);
+    }
+    get_closest_flooring_of_type(x, y, desiredFloorType) {
+        let closestTile = null;
+        let closestDistance = Infinity;
+        for (let i = 0; i < __classPrivateFieldGet(this, _GameMap_flooring_array, "f").length; i++) {
+            for (let j = 0; j < __classPrivateFieldGet(this, _GameMap_flooring_array, "f")[i].length; j++) {
+                if (__classPrivateFieldGet(this, _GameMap_flooring_array, "f")[i][j] === desiredFloorType) {
+                    const distance = PATHFINDING.heuristic(x, y, j, i);
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestTile = new Tile2D(j, i);
                     }
                 }
             }
@@ -942,67 +964,95 @@ GameMap.WALL_MATERIALS = {
 class Pathfinding {
     constructor() {
         _Pathfinding_instances.add(this);
-        _Pathfinding_passability_array.set(this, new Int32Array(GRID_WIDTH * GRID_HEIGHT)); // 2D array dereferenced as a 1D Array.
-        // Initialize the passability array
+        _Pathfinding_passability_array.set(this, new Int32Array(GRID_WIDTH * GRID_HEIGHT));
         __classPrivateFieldGet(this, _Pathfinding_passability_array, "f").fill(0);
     }
     populate_passibility_array() {
         let passability_number = 1;
+        const total_cells = GRID_WIDTH * GRID_HEIGHT;
         // Initialize array with 0s
         __classPrivateFieldGet(this, _Pathfinding_passability_array, "f").fill(0);
-        // First pass: mark walls as -1
-        for (let y = 0; y < GRID_HEIGHT; y++) {
-            for (let x = 0; x < GRID_WIDTH; x++) {
-                if (GAME_MAP.getWall(x, y) !== null) {
-                    __classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[__classPrivateFieldGet(this, _Pathfinding_instances, "m", _Pathfinding_getIndex).call(this, x, y)] = -1;
-                }
+        // First pass: mark walls as -1 (optimized single loop)
+        for (let i = 0; i < total_cells; i++) {
+            const x = i % GRID_WIDTH;
+            const y = Math.floor(i / GRID_WIDTH);
+            if (GAME_MAP.getWall(x, y) !== null) {
+                __classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[i] = -1;
             }
         }
-        // Second pass: flood fill regions
-        for (let y = 0; y < GRID_HEIGHT; y++) {
-            for (let x = 0; x < GRID_WIDTH; x++) {
-                const idx = __classPrivateFieldGet(this, _Pathfinding_instances, "m", _Pathfinding_getIndex).call(this, x, y);
-                if (__classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[idx] === 0) {
-                    this.scanline_flood_fill(x, y, passability_number);
-                    passability_number++;
-                }
+        // Second pass: flood fill regions (optimized single loop)
+        for (let i = 0; i < total_cells; i++) {
+            if (__classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[i] === 0) {
+                const x = i % GRID_WIDTH;
+                const y = Math.floor(i / GRID_WIDTH);
+                this.optimized_flood_fill(x, y, passability_number);
+                passability_number++;
             }
         }
     }
-    scanline_flood_fill(startX, startY, fillValue) {
-        // Create a stack for seed points
-        const stack = [{ x: startX, y: startY }];
+    optimized_flood_fill(startX, startY, fillValue) {
+        // Use array as stack for better performance than push/pop on objects
+        const stack = [startY * GRID_WIDTH + startX]; // Store indices directly
+        const visited = new Uint8Array(GRID_WIDTH * GRID_HEIGHT); // Fast lookup
         while (stack.length > 0) {
-            const { x, y } = stack.pop();
+            const idx = stack.pop();
+            if (visited[idx] || __classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[idx] !== 0) {
+                continue;
+            }
+            const y = Math.floor(idx / GRID_WIDTH);
+            const x = idx % GRID_WIDTH;
             // Find the leftmost x coordinate
             let leftX = x;
-            while (leftX >= 0 && __classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[__classPrivateFieldGet(this, _Pathfinding_instances, "m", _Pathfinding_getIndex).call(this, leftX, y)] === 0) {
+            let leftIdx = idx;
+            while (leftX > 0) {
+                const testIdx = leftIdx - 1;
+                if (visited[testIdx] || __classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[testIdx] !== 0)
+                    break;
                 leftX--;
+                leftIdx = testIdx;
             }
-            leftX++;
             // Find the rightmost x coordinate
             let rightX = x;
-            while (rightX < GRID_WIDTH && __classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[__classPrivateFieldGet(this, _Pathfinding_instances, "m", _Pathfinding_getIndex).call(this, rightX, y)] === 0) {
+            let rightIdx = idx;
+            while (rightX < GRID_WIDTH - 1) {
+                const testIdx = rightIdx + 1;
+                if (visited[testIdx] || __classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[testIdx] !== 0)
+                    break;
                 rightX++;
+                rightIdx = testIdx;
             }
-            rightX--;
-            // Fill the scanline
+            // Fill the scanline and mark as visited
+            let currentIdx = leftIdx;
+            let spanAbove = false;
+            let spanBelow = false;
             for (let i = leftX; i <= rightX; i++) {
-                __classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[__classPrivateFieldGet(this, _Pathfinding_instances, "m", _Pathfinding_getIndex).call(this, i, y)] = fillValue;
-                // Check the line above
+                __classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[currentIdx] = fillValue;
+                visited[currentIdx] = 1;
+                // Check above
                 if (y > 0) {
-                    const upIdx = __classPrivateFieldGet(this, _Pathfinding_instances, "m", _Pathfinding_getIndex).call(this, i, y - 1);
-                    if (__classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[upIdx] === 0) {
-                        stack.push({ x: i, y: y - 1 });
+                    const upIdx = currentIdx - GRID_WIDTH;
+                    const upEmpty = !visited[upIdx] && __classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[upIdx] === 0;
+                    if (!spanAbove && upEmpty) {
+                        stack.push(upIdx);
+                        spanAbove = true;
+                    }
+                    else if (spanAbove && !upEmpty) {
+                        spanAbove = false;
                     }
                 }
-                // Check the line below
+                // Check below
                 if (y < GRID_HEIGHT - 1) {
-                    const downIdx = __classPrivateFieldGet(this, _Pathfinding_instances, "m", _Pathfinding_getIndex).call(this, i, y + 1);
-                    if (__classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[downIdx] === 0) {
-                        stack.push({ x: i, y: y + 1 });
+                    const downIdx = currentIdx + GRID_WIDTH;
+                    const downEmpty = !visited[downIdx] && __classPrivateFieldGet(this, _Pathfinding_passability_array, "f")[downIdx] === 0;
+                    if (!spanBelow && downEmpty) {
+                        stack.push(downIdx);
+                        spanBelow = true;
+                    }
+                    else if (spanBelow && !downEmpty) {
+                        spanBelow = false;
                     }
                 }
+                currentIdx++;
             }
         }
     }
@@ -1733,8 +1783,8 @@ class Blueprint {
             }
         }
         const relevant_items_sorted = items_not_in_stockpile_and_not_reserved.sort((a, b) => {
-            const distance_a = Math.abs(a.x - this.x) + Math.abs(a.y - this.y); // Calculate Manhattan distance for the blueprints
-            const distance_b = Math.abs(b.x - this.x) + Math.abs(b.y - this.y);
+            const distance_a = manh_dist(this.x, this.y, a.x, a.y);
+            const distance_b = manh_dist(this.x, this.y, a.x, a.y);
             return distance_a - distance_b;
         });
         let path_object = null;
@@ -1782,8 +1832,8 @@ class Blueprint {
         }
         const available_items = is_of_needed_item.filter(one_item => !reserved_items.has(`${one_item.x} ${one_item.y}`));
         const available_items_sorted = available_items.sort((a, b) => {
-            const distance_a = Math.abs(a.x - this.x) + Math.abs(a.y - this.y);
-            const distance_b = Math.abs(b.x - this.x) + Math.abs(b.y - this.y);
+            const distance_a = manh_dist(this.x, this.y, a.x, a.y);
+            const distance_b = manh_dist(this.x, this.y, b.x, b.y);
             return distance_a - distance_b;
         });
         for (const one_item of available_items) {
@@ -1889,8 +1939,8 @@ class BlueprintManager {
         // Get all unassigned blueprints, then sort them heuristically.
         const unassigned_blueprints = this.get_blueprints_unnassigned_to_character();
         const sorted_blueprints = unassigned_blueprints.sort((a, b) => {
-            const distance_a = Math.abs(a.x - dwarf.x) + Math.abs(a.y - dwarf.y); // Calculate Manhattan distance for the blueprints
-            const distance_b = Math.abs(b.x - dwarf.x) + Math.abs(b.y - dwarf.y);
+            const distance_a = manh_dist(dwarf.x, dwarf.y, a.x, a.y);
+            const distance_b = manh_dist(dwarf.x, dwarf.y, b.x, b.y);
             return distance_a - distance_b;
         });
         // Now iterate through the sorted blueprints
@@ -2156,7 +2206,7 @@ class MovingEntity {
         if (!dwarven_task) {
             return;
         }
-        if (dwarven_task.moving_entity == null && (Math.abs(this.x - dwarven_task.x) > 1 || Math.abs(this.y - dwarven_task.y) > 1)) {
+        if (dwarven_task.moving_entity == null && (Math.abs(this.x - dwarven_task.x) > 1 || Math.abs(this.y - dwarven_task.y) > 1) && !['WANDER', 'IDLE'].includes(dwarven_task.task_key)) {
             console.log(this.x + "," + this.y + "   " + dwarven_task.x + "," + dwarven_task.y);
             console.log(dwarven_task);
             console.log("Attempted to Jump multiple tiles in one task, there must be an error somewhere.");
@@ -2189,13 +2239,63 @@ class MovingEntity {
             }
         }
     }
+    /* Task Handler for All Tasks Shared Between Dwarves and Animals */
+    handleGoTo(task) {
+        this.banked_time += FrameTime.deltaT;
+        const time_to_move_to_tile = 1000 / TILES_PER_SECOND;
+        if (this.banked_time >= time_to_move_to_tile) {
+            if (this.attempt_set_position(task.x, task.y)) {
+                this.itinerary.shift();
+                this.banked_time -= time_to_move_to_tile;
+            }
+            else {
+                this.itinerary.force_idle();
+            }
+        }
+    }
+    handleIdle(task) {
+        const IDLE_TIME = 2000;
+        this.banked_time += FrameTime.deltaT;
+        if (this.banked_time >= IDLE_TIME) {
+            this.itinerary.shift();
+            this.banked_time -= IDLE_TIME;
+        }
+    }
+    handleWander(task) {
+        const ANIMAL_TILES_PER_SECOND = 5;
+        const TIME_FOR_ANIMAL_TO_MOVE = 1000 / ANIMAL_TILES_PER_SECOND;
+        this.banked_time += FrameTime.deltaT;
+        if (this.banked_time < TIME_FOR_ANIMAL_TO_MOVE) {
+            return;
+        }
+        const direction = getRandomElement(DIRECTIONS);
+        let newX = this.x + direction.x;
+        let newY = this.y + direction.y;
+        if (newX < 0 || newX >= GRID_WIDTH) {
+            newX = this.x;
+        }
+        if (newY < 0 || newY >= GRID_HEIGHT) {
+            newY = this.y;
+        }
+        const current_zone = ZONE_MANAGER.getZoneAtTile(this.x, this.y);
+        const new_zone = ZONE_MANAGER.getZoneAtTile(newX, newY);
+        if (current_zone != new_zone) {
+            return;
+        }
+        this.attempt_set_position(newX, newY);
+        this.banked_time -= TIME_FOR_ANIMAL_TO_MOVE;
+        this.itinerary.shift();
+    }
 }
 MovingEntity.TASK_HANDLERS = { 'GO_TO': 'handleGoTo',
+    'WANDER': 'handleWander',
+    'IDLE': 'handleIdle',
     'DRINK': 'handleDrink',
     'EAT': 'handleEat',
     'SLEEP': 'handleSleep',
     'DRINK_ALCOHOL': 'handleDrinkAlcohol',
     'RELIEVE_BOWELS': 'handleRelieveBowels',
+    'GRAZE': "handleGraze",
     'CHOP_WOOD': 'handleChopWood',
     'PICKUP': 'handlePickup',
     'DUMP': 'handleDump',
@@ -2218,12 +2318,14 @@ var Need_Keys;
     Need_Keys["Bowels"] = "BOWELS";
     Need_Keys["Alcohol"] = "ALCOHOL";
     Need_Keys["Fun"] = "FUN";
+    Need_Keys["Fodder"] = "Fodder";
 })(Need_Keys || (Need_Keys = {}));
 const NEED_HANDLERS = new Map([[Need_Keys.Hunger, 'set_itinerary_to_manage_hunger'],
     [Need_Keys.Thirst, 'set_itinerary_to_manage_thirst'],
     [Need_Keys.Tiredness, 'set_itinerary_to_manage_tiredness'],
     [Need_Keys.Bowels, 'set_itinerary_to_manage_bowels'],
     [Need_Keys.Alcohol, 'set_itinerary_to_manage_alcohol'],
+    [Need_Keys.Fun, 'set_itinerary_to_manage_fodder']
 ]);
 class Need {
     constructor(key, max, seek_when_idle_threshold, seek_force_threshold = -1) {
@@ -2360,6 +2462,20 @@ class Need {
         }
         return tiles_containing_beds;
     }
+    set_itinerary_to_manage_fodder(animal) {
+        const x = animal.x;
+        const y = animal.y;
+        const itinerary = animal.itinerary;
+        const potential_path = GAME_MAP.get_closest_flooring_of_type(x, y, "grass");
+        if (!potential_path) {
+            return false;
+        }
+        const itinerary_step_list = path_array_to_tasks(potential_path);
+        const f_tile = potential_path.length ? potential_path[potential_path.length - 1] : { x, y }; // Final Tile- the one that actually has the water.
+        itinerary_step_list.push(new DwarvenTask("GRAZE", f_tile.x, f_tile.y));
+        itinerary.set_itinerary(itinerary_step_list, null);
+        return true;
+    }
 }
 const MAX_THIRST = 60 * 2 * 1000; // Milliseconds
 const LOOK_FOR_WATER_IF_IDLE = 60 * 1000;
@@ -2373,13 +2489,17 @@ const MAX_BOWELS = 60 * 2 * 1000;
 const LOOK_FOR_BOWELS_IF_IDLE = 60 * 1000;
 const LOOK_FOR_BOWELS_OVERRIDE = 30 * 1000;
 class NeedsSet {
-    constructor() {
+    constructor(needSetSet = "DWARF") {
         this.needsMap = new Map();
-        this.needsMap.set(Need_Keys.Thirst, new Need(Need_Keys.Thirst, MAX_THIRST, LOOK_FOR_WATER_IF_IDLE, LOOK_FOR_WATER_OVERRIDE));
-        this.needsMap.set(Need_Keys.Hunger, new Need(Need_Keys.Hunger, MAX_HUNGER, LOOK_FOR_FOOD_IF_IDLE, LOOK_FOR_FOOD_OVERRIDE));
-        this.needsMap.set(Need_Keys.Tiredness, new Need(Need_Keys.Tiredness, MAX_TIREDNESS, LOOK_FOR_REST_IF_IDLE));
-        this.needsMap.set(Need_Keys.Bowels, new Need(Need_Keys.Bowels, MAX_BOWELS, LOOK_FOR_BOWELS_IF_IDLE, LOOK_FOR_BOWELS_OVERRIDE));
-        this.needsMap.set(Need_Keys.Alcohol, new Need(Need_Keys.Alcohol, MAX_HUNGER, LOOK_FOR_FOOD_IF_IDLE, LOOK_FOR_FOOD_OVERRIDE));
+        if (needSetSet == "DWARF") {
+            this.needsMap.set(Need_Keys.Thirst, new Need(Need_Keys.Thirst, MAX_THIRST, LOOK_FOR_WATER_IF_IDLE, LOOK_FOR_WATER_OVERRIDE));
+            this.needsMap.set(Need_Keys.Hunger, new Need(Need_Keys.Hunger, MAX_HUNGER, LOOK_FOR_FOOD_IF_IDLE, LOOK_FOR_FOOD_OVERRIDE));
+            this.needsMap.set(Need_Keys.Tiredness, new Need(Need_Keys.Tiredness, MAX_TIREDNESS, LOOK_FOR_REST_IF_IDLE));
+            this.needsMap.set(Need_Keys.Bowels, new Need(Need_Keys.Bowels, MAX_BOWELS, LOOK_FOR_BOWELS_IF_IDLE, LOOK_FOR_BOWELS_OVERRIDE));
+            this.needsMap.set(Need_Keys.Alcohol, new Need(Need_Keys.Alcohol, MAX_HUNGER, LOOK_FOR_FOOD_IF_IDLE, LOOK_FOR_FOOD_OVERRIDE));
+        }
+        else if (needSetSet == "GRAZER") {
+        }
     }
     on_tick(itinerary, x, y, character) {
         for (let [key, need] of this.needsMap.entries()) {
@@ -2434,7 +2554,7 @@ class NeedsSet {
     }
 }
 class DwarvenTask {
-    constructor(task_key, x, y, moving_entity = null) {
+    constructor(task_key, x = null, y = null, moving_entity = null) {
         this.task_key = task_key;
         this.x = x;
         this.y = y;
@@ -2510,19 +2630,6 @@ class Dwarf extends MovingEntity {
         }
     }
     /* Handlers for all of the different tasks */
-    handleGoTo(task) {
-        this.banked_time += FrameTime.deltaT;
-        const time_to_move_to_tile = 1000 / TILES_PER_SECOND;
-        if (this.banked_time >= time_to_move_to_tile) {
-            if (this.attempt_set_position(task.x, task.y)) {
-                this.itinerary.shift();
-                this.banked_time -= time_to_move_to_tile;
-            }
-            else {
-                this.itinerary.force_idle();
-            }
-        }
-    }
     handleGoToMovingEntity(task) {
         this.banked_time += FrameTime.deltaT;
         const time_to_move_to_tile = 1000 / TILES_PER_SECOND;
@@ -2581,6 +2688,7 @@ class Dwarf extends MovingEntity {
     }
     handleRelieveBowels(task) {
         this.needs.needsMap.get(Need_Keys.Bowels).reset_to_max();
+        this.itinerary.shift();
     }
     handleDrinkAlcohol(task) {
         this.needs.needsMap.get(Need_Keys.Alcohol).reset_to_max();
@@ -2705,43 +2813,12 @@ class Animal extends MovingEntity {
         this.display_name = "Chicken";
     }
     tick() {
-        this.handle_movement();
+        this.undertake_task_if_exists();
+        if (this.itinerary.is_idle()) {
+            this.itinerary.set_itinerary([new DwarvenTask("WANDER"), new DwarvenTask("WANDER"), new DwarvenTask("WANDER"), new DwarvenTask("WANDER"), new DwarvenTask("WANDER"), new DwarvenTask("IDLE", this.x, this.y)], null);
+        }
         this.handle_eggs();
         this.handle_dwarf_interactions();
-    }
-    handle_movement() {
-        this.banked_time += FrameTime.deltaT;
-        if (this.in_idle_state) {
-            if (this.banked_time > IDLE_TIME_COUNT) {
-                this.in_idle_state = false;
-                this.banked_time -= IDLE_TIME_COUNT;
-            }
-        }
-        else {
-            if (this.banked_time > 1000 / ANIMAL_TILES_PER_SECOND) {
-                const direction = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
-                let newX = this.x + direction.x;
-                let newY = this.y + direction.y;
-                if (newX < 0 || newX >= GRID_WIDTH) {
-                    newX = this.x;
-                }
-                if (newY < 0 || newY >= GRID_HEIGHT) {
-                    newY = this.y;
-                }
-                const current_zone = ZONE_MANAGER.getZoneAtTile(this.x, this.y);
-                const new_zone = ZONE_MANAGER.getZoneAtTile(newX, newY);
-                if (current_zone == new_zone) {
-                    if (this.attempt_set_position(newX, newY)) {
-                        this.banked_time -= 1000 / ANIMAL_TILES_PER_SECOND;
-                        this.moves_since_last_idle++;
-                        if (this.moves_since_last_idle >= MOVES_UNTIL_IDLE) {
-                            this.in_idle_state = true;
-                            this.moves_since_last_idle = 0;
-                        }
-                    }
-                }
-            }
-        }
     }
     handle_eggs() {
         this.egg_time_elapsed += FrameTime.deltaT;
@@ -2752,13 +2829,14 @@ class Animal extends MovingEntity {
     }
     handle_dwarf_interactions() {
         const assigned = this.getDwarvesAssignedToThis();
-        if (assigned.length == 0) {
-            if (this.slaughter) {
-                this.assignDwarfToSlaughter();
-            }
-            else if (this.carry_to_zone) {
-                this.assignDwarfToMoveAnimal();
-            }
+        if (assigned.length > 0) {
+            return;
+        }
+        if (this.slaughter) {
+            this.assignDwarfToSlaughter();
+        }
+        else if (this.carry_to_zone) {
+            this.assignDwarfToMoveAnimal();
         }
     }
     getDwarvesAssignedToThis() {
@@ -3563,9 +3641,12 @@ function gameLoop() {
         updateGrassState();
     }
     updateCameraMovement();
+    setTimeout(gameLoop, 1);
+}
+function renderLoop() {
     call_all_draw_functions();
     update_RHS_menu();
-    window.requestAnimationFrame(gameLoop);
+    window.requestAnimationFrame(renderLoop);
 }
 function checkDeviceAndThrowError() {
     const isMobile = (/Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
@@ -3621,4 +3702,5 @@ loadAllImagesAndLaunch().then(function () {
     document.getElementById("loading_screen").style.opacity = '0';
     document.getElementById("loading_screen").style.pointerEvents = 'none';
     gameLoop();
+    window.requestAnimationFrame(renderLoop);
 }).catch(error => { console.error("Error loading images:", error); });
